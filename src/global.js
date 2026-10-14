@@ -1,0 +1,195 @@
+(function () {
+  var root = document.querySelector('.jh');
+  if (!root || root.dataset.jhInit) return;
+  root.dataset.jhInit = '1';
+  var cfg = window.JH_CONFIG || {};
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Hide links whose config value is empty (e.g. no Instagram yet).
+  root.querySelectorAll('[data-if-config]').forEach(function (el) {
+    if (!cfg[el.dataset.ifConfig]) el.remove();
+  });
+  root.querySelectorAll('[data-year]').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+
+  // ---- Nav ----
+  var nav = root.querySelector('[data-nav]');
+  if (nav) {
+    var onScroll = function () { nav.classList.toggle('is-scrolled', scrollY > 24); };
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+    var toggle = nav.querySelector('[data-nav-toggle]');
+    toggle.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', open);
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    nav.querySelectorAll('.nav__panel a').forEach(function (a) {
+      a.addEventListener('click', function () { nav.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); });
+    });
+    nav.querySelectorAll('.nav__links a').forEach(function (a) {
+      if (a.getAttribute('href') === location.pathname) a.setAttribute('aria-current', 'page');
+    });
+  }
+
+  // ---- Reveal on scroll ----
+  var reveals = root.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {   // runs with reduced motion too: CSS keeps the fade, drops the movement
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else reveals.forEach(function (el) { el.classList.add('is-in'); });
+
+  // Pause ambient loops while they're off-screen.
+  if ('IntersectionObserver' in window) {
+    var ambient = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { e.target.classList.toggle('is-visible', e.isIntersecting); });
+    });
+    root.querySelectorAll('.loop-fig').forEach(function (el) { ambient.observe(el); });
+  }
+
+  // ---- Forms -> HighLevel Inbound Webhook ----
+  root.querySelectorAll('form[data-signup]').forEach(function (form) {
+    var msg = form.querySelector('.form__msg');
+    var btn = form.querySelector('button[type="submit"]');
+    var label = btn ? btn.textContent : '';
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (form.website && form.website.value) return; // honeypot
+      msg.classList.remove('is-error');
+      if (!cfg.signupWebhook) {
+        msg.classList.add('is-error');
+        msg.textContent = 'This form isn’t connected yet. Please email Jay directly for now.';
+        return;
+      }
+      var data = { source: form.dataset.signup, tags: (form.dataset.tags || '').split(',').filter(Boolean), page: location.pathname, submitted_at: new Date().toISOString() };
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (el.name && el.name !== 'website' && el.type !== 'submit') data[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim();
+      });
+      btn.disabled = true; btn.textContent = 'Sending…'; msg.textContent = '';
+      fetch(cfg.signupWebhook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
+        .then(function () { form.reset(); msg.textContent = form.dataset.success || 'Sent. Jay will be in touch soon.'; })
+        .catch(function () { msg.classList.add('is-error'); msg.textContent = 'Your message didn’t send. Check your connection and try again.'; })
+        .then(function () { btn.disabled = false; btn.textContent = label; });
+    });
+  });
+
+  // ---- The gut-brain line ----
+  // Waypoints: [data-gb-start] (the brain), sections with data-gb="left|right", [data-gb-end] (the gut).
+  // The line runs down the side gutters and only crosses the page inside empty section padding,
+  // so it never sits on top of text. It draws itself as you scroll: the whole path is painted once,
+  // then revealed top-down with clip-path, so scrolling never repaints the page-tall SVG.
+  var layer = root.querySelector('[data-gbline]');
+  var start = root.querySelector('[data-gb-start]');
+  var end = root.querySelector('[data-gb-end]');
+  if (layer && start && end) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    var path = document.createElementNS(NS, 'path');
+    svg.setAttribute('aria-hidden', 'true');
+    var reveal = document.createElement('div'); reveal.className = 'gbline__reveal';
+    svg.appendChild(path); reveal.appendChild(svg); layer.appendChild(reveal);
+    var tagBrain = document.createElement('span'); tagBrain.className = 'gbline__tag gbline__tag--side gbline__tag--brain'; tagBrain.textContent = 'the brain';
+    var tagGut = document.createElement('span'); tagGut.className = 'gbline__tag'; tagGut.textContent = 'the gut';
+    var dot = document.createElement('span'); dot.className = 'gbline__dot';
+    layer.appendChild(tagBrain); layer.appendChild(tagGut); layer.appendChild(dot);
+    var H = 0, yStart = 0, yEnd = 0, ready = false;
+    // Opening: the line waits for the headline, then grows out of the breathing orb.
+    var intro = reduce ? 1 : 0, introT0 = performance.now() + 900;
+    dot.style.opacity = reduce ? 1 : 0; dot.style.transition = 'opacity .8s ease';
+    if (!reduce) {
+      var introTick = function (now) {
+        var t = Math.max(0, Math.min(1, (now - introT0) / 1600));
+        intro = 1 - Math.pow(1 - t, 3);                 // ease-out: grows quickly, settles gently
+        if (t > 0) { dot.style.opacity = 1; tagBrain.classList.add('is-on'); }
+        draw();
+        if (t < 1) requestAnimationFrame(introTick);
+      };
+      requestAnimationFrame(introTick);
+    }
+
+    var layout = function () {
+      var base = root.getBoundingClientRect();
+      var W = root.clientWidth;
+      var pos = function (el) { var r = el.getBoundingClientRect(); return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height }; };
+      var gutter = W < 768 ? 7 : Math.max(12, (W - Math.min(W, 1240)) / 2 * 0.5);
+      var sway = W < 768 ? 2 : 14;
+      var xs = { left: gutter, right: W - gutter };
+      var s = pos(start), e = pos(end);
+      var p0 = { x: s.x + s.w / 2, y: s.y + s.h / 2 };
+      var d = 'M' + p0.x + ' ' + p0.y;
+      var cur = p0;
+      var curve = function (to) {
+        var my = (to.y - cur.y) / 2;
+        d += ' C' + cur.x + ' ' + (cur.y + my) + ' ' + to.x + ' ' + (to.y - my) + ' ' + to.x + ' ' + to.y;
+        cur = to;
+      };
+      // run down a gutter with a gentle sway
+      var run = function (x, y1) {
+        if (y1 <= cur.y + 30) return;
+        var steps = Math.max(1, Math.round((y1 - cur.y) / 420));
+        var y0 = cur.y;
+        for (var i = 1; i <= steps; i++) {
+          var y = y0 + (y1 - y0) * i / steps;
+          var dx = (i % 2 ? sway : -sway);
+          var c = (y - cur.y) / 2;
+          d += ' C' + (cur.x + dx) + ' ' + (cur.y + c) + ' ' + (x - dx) + ' ' + (y - c) + ' ' + x + ' ' + y;
+          cur = { x: x, y: y };
+        }
+      };
+      root.querySelectorAll('[data-gb]').forEach(function (sec) {
+        var r = pos(sec);
+        var pad = parseFloat(getComputedStyle(sec).paddingTop) || 80;
+        var x = xs[sec.dataset.gb] || xs.right;
+        var enter = r.y + pad * 0.8;
+        // cross into this side inside the empty top padding (or, for the section holding the start,
+        // simply flow down and out to the gutter)
+        curve({ x: x, y: enter > cur.y + 60 ? enter : Math.min(cur.y + 220, r.y + r.h - 8) });
+        run(x, r.y + r.h - pad * 0.85);              // travel down the gutter, leave room to cross
+      });
+      var ex = e.x + e.w / 2, ey = e.y + e.h / 2;
+      var R = W < 768 ? 12 : 18;
+      var gut = end.closest('.has-gut');
+      if (gut) {
+        // final approach: stay in the gutter, then drop onto the top of the oesophagus (the 3D gut)
+        run(cur.x, ey - 140);
+        curve({ x: ex, y: ey });
+      } else {
+        // no 3D: come in beside the end marker and coil (the gut)
+        run(cur.x, ey - R * 5);
+        curve({ x: ex + R * 2.2, y: ey - R * 2.6 });
+        d += ' C' + (ex + R * 3.4) + ' ' + (ey - R) + ' ' + (ex + R * 2.4) + ' ' + (ey + R * 1.6) + ' ' + (ex + R * .6) + ' ' + (ey + R * 1.2);
+        d += ' A' + R + ' ' + R + ' 0 1 1 ' + (ex + R * .9) + ' ' + (ey - R * .4);
+        d += ' A' + (R * .6) + ' ' + (R * .6) + ' 0 1 0 ' + ex + ' ' + ey;
+      }
+      path.setAttribute('d', d);
+      H = root.scrollHeight;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.style.height = H + 'px';
+      yStart = p0.y; yEnd = gut ? ey : ey + R * 1.6; ready = true;
+      tagBrain.style.left = p0.x + 'px'; tagBrain.style.top = p0.y + 'px';
+      tagGut.style.left = ex + 'px'; tagGut.style.top = (gut ? ey - 4 : ey - R * 1.2) + 'px';
+      tagGut.classList.toggle('gbline__tag--side', !!gut);
+      dot.style.left = p0.x + 'px'; dot.style.top = p0.y + 'px';
+      draw();
+    };
+    var draw = function () {
+      if (!ready) return;
+      var y = H;
+      if (!reduce) {
+        var target = Math.max(yStart + 40, -root.getBoundingClientRect().top + innerHeight * 0.62);
+        y = yStart + (target - yStart) * intro;
+      }
+      reveal.style.clipPath = 'inset(0 0 ' + Math.max(0, H - y) + 'px 0)';
+      if (reduce) tagBrain.classList.add('is-on');
+      tagGut.classList.toggle('is-on', y >= yEnd);
+    };
+    var raf = 0;
+    addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(function () { raf = 0; draw(); }); }, { passive: true });
+    var t; addEventListener('resize', function () { clearTimeout(t); t = setTimeout(layout, 150); });
+    addEventListener('jh:relayout', layout);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+    addEventListener('load', layout);
+    layout();
+  }
+})();

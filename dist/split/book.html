@@ -1,0 +1,277 @@
+<!-- Jay Hayes | page: book (split mode) -->
+<div class="jh">
+<style>
+.jh .nav { position: sticky; top: 0; z-index: 100; transition: background-color .4s var(--ease), box-shadow .4s var(--ease); }
+.jh .nav.is-scrolled { background: rgba(243, 241, 248, .92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(30, 42, 74, .08); }
+.jh .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 18px; padding-bottom: 18px; }
+.jh .wordmark { display: flex; flex-direction: column; text-decoration: none; line-height: 1; }
+.jh .wordmark__name { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: -.02em; }
+.jh .wordmark__role { font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--eucalypt-text); margin-top: 6px; }
+.jh .nav__links { display: flex; gap: 30px; }
+.jh .nav__links a { text-decoration: none; font-weight: 500; font-size: .95rem; padding: 6px 0; border-bottom: 1.5px solid transparent; transition: border-color 200ms ease; }
+.jh .nav__links a[aria-current="page"] { border-bottom-color: var(--apricot); }
+@media (hover: hover) and (pointer: fine) { .jh .nav__links a:hover { border-bottom-color: var(--apricot); } }
+.jh .nav .btn { padding: 14px 22px; font-size: .95rem; }
+.jh .nav__toggle { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; }
+.jh .nav__toggle span, .jh .nav__toggle span::before, .jh .nav__toggle span::after { content: ""; display: block; width: 22px; height: 1.75px; background: var(--dusk); position: relative; transition: transform .3s var(--ease), background-color .3s; }
+.jh .nav__toggle span::before { position: absolute; top: -7px; }
+.jh .nav__toggle span::after { position: absolute; top: 7px; }
+.jh .nav.is-open .nav__toggle span { background: transparent; }
+.jh .nav.is-open .nav__toggle span::before { transform: translateY(7px) rotate(45deg); }
+.jh .nav.is-open .nav__toggle span::after { transform: translateY(-7px) rotate(-45deg); }
+.jh .nav__panel { display: none; }
+@media (max-width: 900px) {
+  .jh .nav__links, .jh .nav__inner > .btn { display: none; }
+  .jh .nav__toggle { display: flex; }
+  .jh .nav__panel { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--mist); box-shadow: 0 12px 24px rgba(30, 42, 74, .08);
+    opacity: 0; transform: translateY(-8px); visibility: hidden; pointer-events: none;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s linear 240ms; }
+  .jh .nav.is-open .nav__panel { opacity: 1; transform: none; visibility: visible; pointer-events: auto;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s; }
+  .jh .nav__panel-inner { display: flex; flex-direction: column; padding: 8px 20px 28px; }
+  .jh .nav__panel a:not(.btn) { font-family: var(--font-display); font-size: 1.75rem; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(30, 42, 74, .1); }
+  .jh .nav__panel .btn { margin-top: 20px; align-self: flex-start; }
+}
+</style>
+
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+<header class="nav" data-nav>
+  <div class="wrap nav__inner">
+    <a href="/" class="wordmark" aria-label="Jay Hayes, gut-brain therapy, home">
+      <span class="wordmark__name">Jay Hayes</span>
+      <span class="wordmark__role">Gut-brain therapy</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+    </nav>
+    <a href="/book" class="btn">Book a free call</a>
+    <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" data-nav-toggle><span></span></button>
+  </div>
+  <div class="nav__panel" data-nav-panel>
+    <div class="nav__panel-inner">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/book" class="btn">Book a free call</a>
+    </div>
+  </div>
+</header>
+
+<style>
+.jh .bk-hero { padding: clamp(56px, 6vw, 100px) 0 48px; }
+.jh .bk-hero h1 { margin-top: 24px; font-size: clamp(2.6rem, 1.5rem + 4vw, 5rem); max-width: 16ch; }
+.jh .bk-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: start; padding-bottom: clamp(88px, 8vw, 140px); }
+.jh .bk-expect h2 { font-family: var(--font-body); font-weight: 600; font-size: 1.15rem; }
+.jh .bk-expect ul { margin-top: 18px; display: grid; gap: 14px; }
+.jh .bk-expect li { padding-left: 26px; position: relative; color: var(--dusk-soft); }
+.jh .bk-expect li::before { content: ""; position: absolute; left: 0; top: .6em; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--eucalypt); }
+.jh .bk-note { margin-top: 32px; padding: 20px 22px; border-radius: 18px; background: var(--haze); font-size: var(--t-small); }
+.jh .bk-cal { background: var(--white); border-radius: var(--radius); padding: 12px; min-height: 640px; box-shadow: 0 1px 0 rgba(30, 42, 74, .06), 0 24px 48px -24px rgba(30, 42, 74, .18); }
+.jh .bk-cal iframe { width: 100%; min-height: 700px; border: 0; border-radius: calc(var(--radius) - 8px); }
+.jh .bk-cal__empty { min-height: 616px; display: grid; place-items: center; text-align: center; padding: 32px; border: 1.5px dashed rgba(30, 42, 74, .2); border-radius: calc(var(--radius) - 8px); }
+.jh .bk-cal__empty p { max-width: 24rem; color: var(--dusk-soft); margin-top: 10px; }
+
+.jh .msg__grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: start; }
+.jh .msg .form { background: var(--white); padding: clamp(24px, 3vw, 40px); border-radius: var(--radius); }
+.jh .msg .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.jh .consent { display: flex; gap: 12px; align-items: flex-start; font-size: var(--t-small); color: var(--dusk-soft); }
+.jh .consent input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--eucalypt); flex: none; }
+.jh .msg .btn { justify-self: start; }
+@media (max-width: 991px) {
+  .jh .bk-grid, .jh .msg__grid { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 600px) { .jh .msg .form__row { grid-template-columns: 1fr; } }
+</style>
+
+<main>
+  <section class="bk-hero">
+    <div class="wrap">
+      <p class="label">Free 20&#8209;minute call</p>
+      <h1 class="display">Let’s talk about what your gut is doing.</h1>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap bk-grid">
+      <div class="bk-expect">
+        <h2>On the call, we’ll</h2>
+        <ul>
+          <li>talk through your symptoms and what you’ve already tried</li>
+          <li>look at whether gut-brain therapy suits what’s going on for you</li>
+          <li>answer your questions about sessions, timing and cost</li>
+          <li>agree on a next step, if it feels right</li>
+        </ul>
+        <p class="bk-note">The call is by video, free, and comes with no obligation to book further sessions.</p>
+      </div>
+      <div class="bk-cal" data-booking>
+        <div class="bk-cal__empty" data-booking-empty>
+          <div>
+            <p class="h3">Booking calendar</p>
+            <p>The online calendar isn’t connected yet. Please use the message form below and Jay will get back to you to find a time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--haze msg" id="message">
+    <div class="wrap msg__grid">
+      <div>
+        <p class="label">Prefer to write first?</p>
+        <h2 class="h2" style="margin-top:20px">Send Jay a message</h2>
+        <p class="muted" style="margin-top:20px;max-width:28rem">Ask a question or tell her a little about what’s going on. You’ll hear back within two business days.</p>
+      </div>
+      <form class="form" data-signup="contact" data-tags="website-enquiry" data-success="Thanks, your message is on its way. Jay will reply within two business days.">
+        <div class="form__row">
+          <div class="field"><label for="c-first">First name</label><input id="c-first" name="first_name" autocomplete="given-name" required></div>
+          <div class="field"><label for="c-last">Last name</label><input id="c-last" name="last_name" autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label for="c-email">Email</label><input id="c-email" type="email" name="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-msg">Your message</label><textarea id="c-msg" name="message" required></textarea></div>
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="consent"><input type="checkbox" name="consent" required> I agree to Jay storing my details to reply to this message.</label>
+        <button type="submit" class="btn">Send message</button>
+        <p class="form__msg" aria-live="polite"></p>
+        <p class="muted" style="font-size:.8125rem">This form isn’t monitored for emergencies. If you’re in crisis, call Lifeline on 13 11 14 or 000.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var url = (window.JH_CONFIG || {}).bookingCalendarUrl;
+  var box = document.querySelector('[data-booking]');
+  if (!url || !box) return;
+  box.querySelector('[data-booking-empty]').remove();
+  var f = document.createElement('iframe');
+  f.src = url; f.title = 'Book a free 20-minute call with Jay'; f.loading = 'lazy'; f.scrolling = 'no';
+  f.id = 'jh-booking-' + Math.random().toString(36).slice(2);
+  box.appendChild(f);
+  // HighLevel's embed script resizes the calendar to fit its content.
+  var s = document.createElement('script');
+  s.src = 'https://link.msgsndr.com/js/form_embed.js'; s.async = true;
+  document.body.appendChild(s);
+})();
+</script>
+
+<style>
+.jh .footer { background: var(--mist); padding: 72px 0 40px; font-size: var(--t-small); position: relative; z-index: 1; }
+.jh .footer__top { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid rgba(30, 42, 74, .12); }
+.jh .footer__about p { margin-top: 18px; max-width: 26rem; color: var(--dusk-soft); }
+.jh .footer h2 { font-size: var(--t-label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--eucalypt-text); margin-bottom: 14px; }
+.jh .footer__links { display: flex; flex-direction: column; gap: 8px; }
+.jh .footer__links a { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .jh .footer__links a:hover { text-decoration: underline; text-underline-offset: 3px; } }
+.jh .footer__fine { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding-top: 32px; color: var(--dusk-soft); font-size: .8125rem; line-height: 1.6; }
+.jh .footer__copy { margin-top: 28px; color: var(--dusk-soft); font-size: .8125rem; }
+@media (max-width: 767px) {
+  .jh .footer__top, .jh .footer__fine { grid-template-columns: 1fr; gap: 32px; }
+}
+</style>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__about">
+        <a href="/" class="wordmark" aria-label="Jay Hayes home">
+          <span class="wordmark__name">Jay Hayes</span>
+          <span class="wordmark__role">Gut-brain therapy</span>
+        </a>
+        <p>Psychotherapy and gut-directed hypnotherapy for people living with IBS and other gut-brain conditions. Sessions online, from Brisbane.</p>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <nav class="footer__links" aria-label="Footer">
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#approach">Approach</a>
+          <a href="/about">About Jay</a>
+          <a href="/resources">Free resources</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/book">Book a free call</a>
+        </nav>
+      </div>
+      <div>
+        <h2>Get in touch</h2>
+        <div class="footer__links">
+          <a href="/book#message">Send a message</a>
+          <a href="mailto:" data-if-config="contactEmail"></a>
+          <a href="" target="_blank" rel="noopener" data-if-config="instagramUrl">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__fine">
+      <p><strong>A note on medical care.</strong> Gut-brain therapy works alongside medical care, not instead of it. If you haven’t already, please see your GP or gastroenterologist to rule out other causes of your symptoms. If you’re in crisis, call Lifeline on 13 11 14 or emergency services on 000.</p>
+      <p>Jay lives and works on the lands of the Turrbal and Yuggera peoples. She pays her respects to Elders past and present, and acknowledges Aboriginal and Torres Strait Islander peoples as the Traditional Custodians of this land.</p>
+    </div>
+    <p class="footer__copy">© <span data-year>2026</span> Jay Hayes. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Smooth scrolling (Lenis), photo lean on fast scroll, and the 2px progress bar.
+     Off for prefers-reduced-motion: native scrolling, no lean (the progress bar still tracks the page). -->
+<script type="module">
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const bar = document.querySelector('[data-scroll-progress]');
+const photos = Array.from(document.querySelectorAll('[data-lean]'));
+const nav = document.querySelector('[data-nav]');
+const nativeProgress = () => {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+};
+const setBar = (p) => { if (bar) bar.style.transform = `scaleX(${p.toFixed(4)})`; };
+
+if (reduce) {
+  addEventListener('scroll', () => setBar(nativeProgress()), { passive: true });
+  setBar(nativeProgress());
+} else {
+  let lenis = null;
+  try {
+    const { default: Lenis } = await import('https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs');
+    // lerp 0.085 + wheelMultiplier 0.9: the wheel glides with a little weight. Touch stays native (Lenis default).
+    lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, autoRaf: false });
+    window.jhLenis = lenis;
+  } catch (e) { lenis = null; }                                       // CDN blocked: plain native scrolling still works
+
+  // Same-page anchor links (#faq, /#how-it-works on the homepage) glide to their section, clear of the sticky nav.
+  if (lenis) document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href*="#"]');
+    if (!a || a.pathname !== location.pathname || !a.hash) return;
+    const target = document.querySelector(a.hash);
+    if (!target) return;
+    e.preventDefault();
+    lenis.scrollTo(target, { offset: -((nav ? nav.offsetHeight : 0) + 16), duration: 1.2 });
+    history.pushState(null, '', a.hash);
+  });
+
+  // One loop drives Lenis, the photo lean and the progress bar. Paused while the tab is hidden.
+  let raf = 0, skew = 0, lastWritten = null;
+  const frame = (time) => {
+    raf = requestAnimationFrame(frame);
+    if (lenis) lenis.raf(time);
+    const v = lenis ? Math.max(-7, Math.min(7, lenis.velocity || 0)) : 0;
+    skew += (v * 0.35 - skew) * 0.12;                                // ease toward the scroll speed
+    if (Math.abs(skew) < 0.002) skew = 0;
+    const t = skew === 0 ? '' : `skewY(${skew.toFixed(3)}deg) scale(${(1 - Math.abs(skew) * 0.006).toFixed(4)})`;
+    if (t !== lastWritten) {                                          // only touch the DOM when it changes
+      photos.forEach((p) => { p.style.transform = t; });
+      lastWritten = t;
+    }
+    setBar(lenis ? lenis.progress || 0 : nativeProgress());
+  };
+  const start = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  addEventListener('pagehide', (e) => { if (e.persisted) return; stop(); if (lenis) { lenis.destroy(); lenis = null; window.jhLenis = null; } });
+  start();
+}
+</script>
+
+
+</div>

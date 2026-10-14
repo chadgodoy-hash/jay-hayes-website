@@ -1,0 +1,121 @@
+<style>
+.jh .ab-hero { padding: clamp(56px, 6vw, 110px) 0 clamp(72px, 7vw, 120px); }
+.jh .ab-hero__grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 72px; align-items: end; }
+.jh .ab-hero h1 { margin-top: 28px; font-size: clamp(2.6rem, 1.5rem + 4.4vw, 5.4rem); max-width: 14ch; }
+.jh .ab-hero .lead { margin-top: 28px; max-width: 34rem; }
+.jh .ab-photo { border-radius: 200px 200px var(--radius) var(--radius); overflow: hidden; aspect-ratio: 4 / 5; }
+.jh .ab-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.jh .ab-story__grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 72px; }
+.jh .ab-story .prose { font-size: 1.125rem; max-width: 40rem; }
+
+.jh .ab-quote blockquote { font-family: var(--font-display); font-size: clamp(1.7rem, 1.1rem + 2.3vw, 3rem); line-height: 1.25; letter-spacing: -.015em; max-width: 24ch; }
+.jh .ab-quote blockquote::before { content: "“"; display: block; color: var(--apricot); font-size: 1.6em; line-height: .6; margin-bottom: 18px; }
+.jh .ab-quote__grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 72px; align-items: center; }
+.jh .ab-quote__img { width: 100%; border-radius: var(--radius); aspect-ratio: 4 / 3; object-fit: cover; object-position: 60% 40%; }
+.jh .ab-quote figcaption { margin-top: 28px; color: rgba(243, 241, 248, .7); max-width: 34rem; }
+
+.jh .ab-how__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 56px; }
+.jh .ab-how__item { padding-top: 24px; border-top: 1.5px solid var(--dusk); }
+.jh .ab-how__item h3 { font-family: var(--font-body); font-weight: 600; font-size: 1.15rem; }
+.jh .ab-how__item p { margin-top: 10px; color: var(--dusk-soft); }
+
+.jh .ab-creds__grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 72px; }
+.jh .ab-creds dl { display: grid; gap: 0; }
+.jh .ab-creds dl div { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px 0; border-top: 1px solid rgba(30, 42, 74, .14); }
+.jh .ab-creds dt { font-weight: 600; }
+.jh .ab-creds dd { color: var(--dusk-soft); }
+
+.jh .ab-cta { text-align: center; }
+.jh .ab-cta .lead { max-width: 34rem; margin: 22px auto 40px; }
+
+@media (max-width: 991px) {
+  .jh .ab-hero__grid, .jh .ab-story__grid, .jh .ab-creds__grid, .jh .ab-quote__grid { grid-template-columns: 1fr; gap: 40px; }
+  .jh .ab-how__grid { grid-template-columns: 1fr; }
+  .jh .ab-photo { max-width: 440px; }
+}
+@media (max-width: 600px) { .jh .ab-creds dl div { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+
+<main>
+  <section class="ab-hero">
+    <div class="wrap ab-hero__grid">
+      <div>
+        <p class="label">About Jay</p>
+        <h1 class="display">From social work to the gut-brain connection.</h1>
+        <p class="lead">I’m a psychotherapist and clinical hypnotherapist based in Brisbane, Australia. My work focuses on one thing: helping people whose digestive symptoms have taken over their lives.</p>
+      </div>
+      <div class="ab-photo" data-lean><img src="{{img:jay-dogs.jpg}}" alt="Jay Hayes sitting in a pink chair with a coffee mug and her two small dogs on her lap" width="1000" height="1250" fetchpriority="high"></div>
+    </div>
+  </section>
+
+  <section class="band band--white ab-story">
+    <div class="wrap ab-story__grid">
+      <div data-reveal>
+        <p class="label">My path</p>
+        <h2 class="h2" style="margin-top:20px">How I got here</h2>
+      </div>
+      <div class="prose" data-reveal>
+        <p>My career began as an accredited social worker in demanding settings: corrections, drug and alcohol rehabilitation, and Indigenous mental health. That work taught me how much stress and lived experience shape the body, and how often people are left to manage both on their own.</p>
+        <p>Over time I found my true passion in psychotherapy, and in particular in working with clients living with digestive health disorders. So many had been through test after test and diet after diet, and still felt their gut was in charge.</p>
+        <p>Today I lead gut-brain coaching at Diet vs Disease, and I see clients one-to-one through my own practice. I bring together talk therapy, gut-directed hypnotherapy, nervous system work and EMDR, because the connection between the gut and the brain runs in both directions, and the best results come from working with both.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--dusk ab-quote">
+    <div class="wrap ab-quote__grid">
+      <figure data-reveal>
+        <blockquote>Health to me means looking after myself holistically – mind and body.</blockquote>
+        <figcaption>I eat a balanced diet and keep exercise fun, so you’ll find me riding my bike or hiking with friends. I feel my best when I meditate daily, hold true to my boundaries and practise self-care and self-compassion.</figcaption>
+      </figure>
+      <div data-reveal><img class="ab-quote__img" data-lean src="{{img:jay-hiking.jpg}}" alt="Jay smiling on a bushwalk in front of a waterfall, wearing a hiking backpack" loading="lazy" width="1200" height="900"></div>
+    </div>
+  </section>
+
+  <section class="band ab-how">
+    <div class="wrap">
+      <div data-reveal>
+        <p class="label">What to expect</p>
+        <h2 class="h2" style="margin-top:20px;max-width:18ch">How I work with clients</h2>
+      </div>
+      <div class="ab-how__grid">
+        <div class="ab-how__item" data-reveal>
+          <h3>Mind and body, together</h3>
+          <p>Your symptoms are physical, and so is the nervous system that shapes them. We work on both, rather than treating your gut and your stress as separate problems.</p>
+        </div>
+        <div class="ab-how__item" data-reveal>
+          <h3>Built around you</h3>
+          <p>We choose from talk therapy, gut-directed hypnotherapy, nervous system work and EMDR based on what you need, not a fixed script.</p>
+        </div>
+        <div class="ab-how__item" data-reveal>
+          <h3>Alongside your medical care</h3>
+          <p>This work complements the care you get from your GP, gastroenterologist or dietitian. It doesn’t replace it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--haze ab-creds">
+    <div class="wrap ab-creds__grid">
+      <div data-reveal>
+        <p class="label">Qualifications</p>
+        <h2 class="h2" style="margin-top:20px">Training and experience</h2>
+      </div>
+      <dl data-reveal>
+        <div><dt>Bachelor of Arts, Social Work</dt><dd>Monash University</dd></div>
+        <div><dt>Bachelor of Arts, Psychology</dt><dd>Monash University</dd></div>
+        <div><dt>Clinical Hypnotherapist and Psychotherapist</dt><dd>Australia</dd></div>
+        <div><dt>Head of Gut-Brain Coaching</dt><dd>Diet vs Disease</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band band--dusk ab-cta">
+    <div class="wrap wrap--narrow" data-reveal>
+      <h2 class="h2">Let’s talk about your gut.</h2>
+      <p class="lead">A free 20&#8209;minute call is the easiest way to see whether we’re a good fit.</p>
+      <a href="/book" class="btn">Book a free call{{include:arrow}}</a>
+    </div>
+  </section>
+</main>

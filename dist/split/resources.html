@@ -1,0 +1,345 @@
+<!-- Jay Hayes | page: resources (split mode) -->
+<div class="jh">
+<style>
+.jh .nav { position: sticky; top: 0; z-index: 100; transition: background-color .4s var(--ease), box-shadow .4s var(--ease); }
+.jh .nav.is-scrolled { background: rgba(243, 241, 248, .92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(30, 42, 74, .08); }
+.jh .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 18px; padding-bottom: 18px; }
+.jh .wordmark { display: flex; flex-direction: column; text-decoration: none; line-height: 1; }
+.jh .wordmark__name { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: -.02em; }
+.jh .wordmark__role { font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--eucalypt-text); margin-top: 6px; }
+.jh .nav__links { display: flex; gap: 30px; }
+.jh .nav__links a { text-decoration: none; font-weight: 500; font-size: .95rem; padding: 6px 0; border-bottom: 1.5px solid transparent; transition: border-color 200ms ease; }
+.jh .nav__links a[aria-current="page"] { border-bottom-color: var(--apricot); }
+@media (hover: hover) and (pointer: fine) { .jh .nav__links a:hover { border-bottom-color: var(--apricot); } }
+.jh .nav .btn { padding: 14px 22px; font-size: .95rem; }
+.jh .nav__toggle { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; }
+.jh .nav__toggle span, .jh .nav__toggle span::before, .jh .nav__toggle span::after { content: ""; display: block; width: 22px; height: 1.75px; background: var(--dusk); position: relative; transition: transform .3s var(--ease), background-color .3s; }
+.jh .nav__toggle span::before { position: absolute; top: -7px; }
+.jh .nav__toggle span::after { position: absolute; top: 7px; }
+.jh .nav.is-open .nav__toggle span { background: transparent; }
+.jh .nav.is-open .nav__toggle span::before { transform: translateY(7px) rotate(45deg); }
+.jh .nav.is-open .nav__toggle span::after { transform: translateY(-7px) rotate(-45deg); }
+.jh .nav__panel { display: none; }
+@media (max-width: 900px) {
+  .jh .nav__links, .jh .nav__inner > .btn { display: none; }
+  .jh .nav__toggle { display: flex; }
+  .jh .nav__panel { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--mist); box-shadow: 0 12px 24px rgba(30, 42, 74, .08);
+    opacity: 0; transform: translateY(-8px); visibility: hidden; pointer-events: none;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s linear 240ms; }
+  .jh .nav.is-open .nav__panel { opacity: 1; transform: none; visibility: visible; pointer-events: auto;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s; }
+  .jh .nav__panel-inner { display: flex; flex-direction: column; padding: 8px 20px 28px; }
+  .jh .nav__panel a:not(.btn) { font-family: var(--font-display); font-size: 1.75rem; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(30, 42, 74, .1); }
+  .jh .nav__panel .btn { margin-top: 20px; align-self: flex-start; }
+}
+</style>
+
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+<header class="nav" data-nav>
+  <div class="wrap nav__inner">
+    <a href="/" class="wordmark" aria-label="Jay Hayes, gut-brain therapy, home">
+      <span class="wordmark__name">Jay Hayes</span>
+      <span class="wordmark__role">Gut-brain therapy</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+    </nav>
+    <a href="/book" class="btn">Book a free call</a>
+    <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" data-nav-toggle><span></span></button>
+  </div>
+  <div class="nav__panel" data-nav-panel>
+    <div class="nav__panel-inner">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/book" class="btn">Book a free call</a>
+    </div>
+  </div>
+</header>
+
+<style>
+.jh .rs-hero { padding: clamp(56px, 6vw, 100px) 0 clamp(56px, 5vw, 88px); }
+.jh .rs-hero h1 { margin-top: 24px; font-size: clamp(2.6rem, 1.5rem + 4vw, 5rem); max-width: 15ch; }
+.jh .rs-hero .lead { margin-top: 28px; max-width: 36rem; }
+
+.jh .res-list { border-top: 1px solid rgba(30, 42, 74, .14); }
+.jh .res { display: grid; grid-template-columns: 180px minmax(0, 1fr) 240px; gap: 16px 48px; padding: 36px 0; border-bottom: 1px solid rgba(30, 42, 74, .14); }
+.jh .res__meta { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+.jh .res__type { font-size: var(--t-label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--eucalypt-text); }
+.jh .res__format { font-size: var(--t-small); color: var(--dusk-soft); }
+.jh .res__desc { margin-top: 10px; color: var(--dusk-soft); max-width: 36rem; }
+.jh .res__action { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.jh .res__status { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-small); font-weight: 600; }
+.jh .res__status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--eucalypt); }
+.jh .res__status--ready::before { background: var(--eucalypt); }
+.jh .res__toggle { padding: 14px 22px; }
+.jh .res__form { grid-column: 2 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px 16px; max-width: 560px;
+  opacity: 0; transform: translateY(-6px); transition: opacity 200ms ease, transform 240ms var(--ease); }
+.jh .res__form.is-open { opacity: 1; transform: none; }
+.jh .res__form .btn { padding: 15px 24px; }
+.jh .res__form .form__msg { grid-column: 1 / -1; }
+
+.jh .rs-updates { text-align: center; }
+.jh .rs-updates .lead { max-width: 32rem; margin: 22px auto 0; }
+.jh .rs-updates form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; max-width: 480px; margin: 36px auto 0; text-align: left; }
+.jh .rs-updates .field input { background: rgba(243, 241, 248, .96); }
+.jh .rs-updates .form__msg { grid-column: 1 / -1; text-align: center; color: rgba(243, 241, 248, .85); }
+.jh .rs-updates .form__msg.is-error { color: #FFC2B3; }
+
+@media (max-width: 900px) {
+  .jh .res { grid-template-columns: 1fr; gap: 14px; padding: 28px 0; }
+  .jh .res__meta { flex-direction: row; gap: 14px; align-items: baseline; padding-top: 0; }
+  .jh .res__action { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .jh .res__form { grid-column: auto; }
+}
+@media (max-width: 520px) {
+  .jh .res__form, .jh .rs-updates form { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .jh .res__form { transform: none; } }
+</style>
+
+<main>
+  <section class="rs-hero">
+    <div class="wrap">
+      <p class="label">Free resources</p>
+      <h1 class="display">Tools for a calmer gut, on their way.</h1>
+      <p class="lead">I’m putting together free resources you can use between appointments, or before you’re ready to book. Choose the ones you’d like and I’ll email you as soon as each one is ready.</p>
+    </div>
+  </section>
+
+  <section class="band band--white" style="padding-top:clamp(48px,5vw,80px)">
+    <div class="wrap">
+      <ul class="res-list">
+        <li class="res" data-reveal>
+          <div class="res__meta"><span class="res__type">Audio</span><span class="res__format">MP3 · about 10 minutes</span></div>
+          <div class="res__body">
+            <h2 class="res__title h3">A 10-minute gut-calming relaxation</h2>
+            <p class="res__desc">A short guided relaxation to help settle your nervous system when your gut flares. Listen with headphones, somewhere you can sit or lie down.</p>
+          </div>
+          <div class="res__action">
+            <span class="res__status ">Coming soon</span>
+            <button type="button" class="btn btn--ghost res__toggle" aria-expanded="false" aria-controls="res-gut-calming-audio">Notify me</button>
+          </div>
+          <form class="res__form form" id="res-gut-calming-audio" hidden data-signup="resource-waitlist" data-tags="resource-waitlist,resource-gut-calming-audio"
+            data-success="You’re on the list. Jay will email you when it’s ready.">
+            <input type="hidden" name="resource" value="gut-calming-audio">
+            <input type="hidden" name="resource_title" value="A 10-minute gut-calming relaxation">
+            <div class="field"><label for="res-gut-calming-audio-email">Email</label><input id="res-gut-calming-audio-email" type="email" name="email" autocomplete="email" required></div>
+            <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button type="submit" class="btn">Add me to the list</button>
+            <p class="form__msg" aria-live="polite"></p>
+          </form>
+        </li>
+        <li class="res" data-reveal>
+          <div class="res__meta"><span class="res__type">Printable</span><span class="res__format">PDF · printable</span></div>
+          <div class="res__body">
+            <h2 class="res__title h3">Gut-brain symptom diary</h2>
+            <p class="res__desc">A simple daily page for noticing patterns between your symptoms, stress, sleep and meals, so you have something concrete to bring to your GP or to our sessions.</p>
+          </div>
+          <div class="res__action">
+            <span class="res__status ">Coming soon</span>
+            <button type="button" class="btn btn--ghost res__toggle" aria-expanded="false" aria-controls="res-symptom-diary">Notify me</button>
+          </div>
+          <form class="res__form form" id="res-symptom-diary" hidden data-signup="resource-waitlist" data-tags="resource-waitlist,resource-symptom-diary"
+            data-success="You’re on the list. Jay will email you when it’s ready.">
+            <input type="hidden" name="resource" value="symptom-diary">
+            <input type="hidden" name="resource_title" value="Gut-brain symptom diary">
+            <div class="field"><label for="res-symptom-diary-email">Email</label><input id="res-symptom-diary-email" type="email" name="email" autocomplete="email" required></div>
+            <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button type="submit" class="btn">Add me to the list</button>
+            <p class="form__msg" aria-live="polite"></p>
+          </form>
+        </li>
+        <li class="res" data-reveal>
+          <div class="res__meta"><span class="res__type">Guide</span><span class="res__format">PDF guide</span></div>
+          <div class="res__body">
+            <h2 class="res__title h3">The gut-brain connection, in plain English</h2>
+            <p class="res__desc">How your gut and brain talk to each other, why stress and symptoms feed each other, and what gut-directed therapy actually involves.</p>
+          </div>
+          <div class="res__action">
+            <span class="res__status ">Coming soon</span>
+            <button type="button" class="btn btn--ghost res__toggle" aria-expanded="false" aria-controls="res-gut-brain-guide">Notify me</button>
+          </div>
+          <form class="res__form form" id="res-gut-brain-guide" hidden data-signup="resource-waitlist" data-tags="resource-waitlist,resource-gut-brain-guide"
+            data-success="You’re on the list. Jay will email you when it’s ready.">
+            <input type="hidden" name="resource" value="gut-brain-guide">
+            <input type="hidden" name="resource_title" value="The gut-brain connection, in plain English">
+            <div class="field"><label for="res-gut-brain-guide-email">Email</label><input id="res-gut-brain-guide-email" type="email" name="email" autocomplete="email" required></div>
+            <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button type="submit" class="btn">Add me to the list</button>
+            <p class="form__msg" aria-live="polite"></p>
+          </form>
+        </li>
+        <li class="res" data-reveal>
+          <div class="res__meta"><span class="res__type">Checklist</span><span class="res__format">PDF · one page</span></div>
+          <div class="res__body">
+            <h2 class="res__title h3">Questions to ask your GP about IBS</h2>
+            <p class="res__desc">A one-page checklist to help you get the most from your next appointment, including the questions people often wish they’d asked.</p>
+          </div>
+          <div class="res__action">
+            <span class="res__status ">Coming soon</span>
+            <button type="button" class="btn btn--ghost res__toggle" aria-expanded="false" aria-controls="res-gp-questions">Notify me</button>
+          </div>
+          <form class="res__form form" id="res-gp-questions" hidden data-signup="resource-waitlist" data-tags="resource-waitlist,resource-gp-questions"
+            data-success="You’re on the list. Jay will email you when it’s ready.">
+            <input type="hidden" name="resource" value="gp-questions">
+            <input type="hidden" name="resource_title" value="Questions to ask your GP about IBS">
+            <div class="field"><label for="res-gp-questions-email">Email</label><input id="res-gp-questions-email" type="email" name="email" autocomplete="email" required></div>
+            <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <button type="submit" class="btn">Add me to the list</button>
+            <p class="form__msg" aria-live="polite"></p>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band band--dusk rs-updates">
+    <div class="wrap wrap--narrow" data-reveal>
+      <p class="label" style="justify-content:center">Stay in the loop</p>
+      <h2 class="h2" style="margin-top:20px">Hear about every new resource.</h2>
+      <p class="lead">One short email when something new is ready. No spam, and you can unsubscribe any time.</p>
+      <form class="form" data-signup="resources-updates" data-tags="resource-updates" data-success="You’re on the list. Watch your inbox.">
+        <div class="field"><label for="rs-email" class="sr-only">Email</label><input id="rs-email" type="email" name="email" autocomplete="email" placeholder="Your email" required></div>
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="btn">Keep me posted</button>
+        <p class="form__msg" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script>
+// "Notify me" opens a small email form in place and moves focus to it.
+document.querySelectorAll('.res__toggle').forEach(function (btn) {
+  var form = document.getElementById(btn.getAttribute('aria-controls'));
+  btn.addEventListener('click', function () {
+    var open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', !open);
+    if (open) { form.classList.remove('is-open'); setTimeout(function () { if (btn.getAttribute('aria-expanded') !== 'true') form.hidden = true; }, 200); return; }
+    form.hidden = false;
+    requestAnimationFrame(function () { form.classList.add('is-open'); form.querySelector('input[type="email"]').focus({ preventScroll: true }); });
+  });
+});
+</script>
+
+<style>
+.jh .footer { background: var(--mist); padding: 72px 0 40px; font-size: var(--t-small); position: relative; z-index: 1; }
+.jh .footer__top { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid rgba(30, 42, 74, .12); }
+.jh .footer__about p { margin-top: 18px; max-width: 26rem; color: var(--dusk-soft); }
+.jh .footer h2 { font-size: var(--t-label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--eucalypt-text); margin-bottom: 14px; }
+.jh .footer__links { display: flex; flex-direction: column; gap: 8px; }
+.jh .footer__links a { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .jh .footer__links a:hover { text-decoration: underline; text-underline-offset: 3px; } }
+.jh .footer__fine { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding-top: 32px; color: var(--dusk-soft); font-size: .8125rem; line-height: 1.6; }
+.jh .footer__copy { margin-top: 28px; color: var(--dusk-soft); font-size: .8125rem; }
+@media (max-width: 767px) {
+  .jh .footer__top, .jh .footer__fine { grid-template-columns: 1fr; gap: 32px; }
+}
+</style>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__about">
+        <a href="/" class="wordmark" aria-label="Jay Hayes home">
+          <span class="wordmark__name">Jay Hayes</span>
+          <span class="wordmark__role">Gut-brain therapy</span>
+        </a>
+        <p>Psychotherapy and gut-directed hypnotherapy for people living with IBS and other gut-brain conditions. Sessions online, from Brisbane.</p>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <nav class="footer__links" aria-label="Footer">
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#approach">Approach</a>
+          <a href="/about">About Jay</a>
+          <a href="/resources">Free resources</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/book">Book a free call</a>
+        </nav>
+      </div>
+      <div>
+        <h2>Get in touch</h2>
+        <div class="footer__links">
+          <a href="/book#message">Send a message</a>
+          <a href="mailto:" data-if-config="contactEmail"></a>
+          <a href="" target="_blank" rel="noopener" data-if-config="instagramUrl">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__fine">
+      <p><strong>A note on medical care.</strong> Gut-brain therapy works alongside medical care, not instead of it. If you haven’t already, please see your GP or gastroenterologist to rule out other causes of your symptoms. If you’re in crisis, call Lifeline on 13 11 14 or emergency services on 000.</p>
+      <p>Jay lives and works on the lands of the Turrbal and Yuggera peoples. She pays her respects to Elders past and present, and acknowledges Aboriginal and Torres Strait Islander peoples as the Traditional Custodians of this land.</p>
+    </div>
+    <p class="footer__copy">© <span data-year>2026</span> Jay Hayes. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Smooth scrolling (Lenis), photo lean on fast scroll, and the 2px progress bar.
+     Off for prefers-reduced-motion: native scrolling, no lean (the progress bar still tracks the page). -->
+<script type="module">
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const bar = document.querySelector('[data-scroll-progress]');
+const photos = Array.from(document.querySelectorAll('[data-lean]'));
+const nav = document.querySelector('[data-nav]');
+const nativeProgress = () => {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+};
+const setBar = (p) => { if (bar) bar.style.transform = `scaleX(${p.toFixed(4)})`; };
+
+if (reduce) {
+  addEventListener('scroll', () => setBar(nativeProgress()), { passive: true });
+  setBar(nativeProgress());
+} else {
+  let lenis = null;
+  try {
+    const { default: Lenis } = await import('https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.mjs');
+    // lerp 0.085 + wheelMultiplier 0.9: the wheel glides with a little weight. Touch stays native (Lenis default).
+    lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, autoRaf: false });
+    window.jhLenis = lenis;
+  } catch (e) { lenis = null; }                                       // CDN blocked: plain native scrolling still works
+
+  // Same-page anchor links (#faq, /#how-it-works on the homepage) glide to their section, clear of the sticky nav.
+  if (lenis) document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href*="#"]');
+    if (!a || a.pathname !== location.pathname || !a.hash) return;
+    const target = document.querySelector(a.hash);
+    if (!target) return;
+    e.preventDefault();
+    lenis.scrollTo(target, { offset: -((nav ? nav.offsetHeight : 0) + 16), duration: 1.2 });
+    history.pushState(null, '', a.hash);
+  });
+
+  // One loop drives Lenis, the photo lean and the progress bar. Paused while the tab is hidden.
+  let raf = 0, skew = 0, lastWritten = null;
+  const frame = (time) => {
+    raf = requestAnimationFrame(frame);
+    if (lenis) lenis.raf(time);
+    const v = lenis ? Math.max(-7, Math.min(7, lenis.velocity || 0)) : 0;
+    skew += (v * 0.35 - skew) * 0.12;                                // ease toward the scroll speed
+    if (Math.abs(skew) < 0.002) skew = 0;
+    const t = skew === 0 ? '' : `skewY(${skew.toFixed(3)}deg) scale(${(1 - Math.abs(skew) * 0.006).toFixed(4)})`;
+    if (t !== lastWritten) {                                          // only touch the DOM when it changes
+      photos.forEach((p) => { p.style.transform = t; });
+      lastWritten = t;
+    }
+    setBar(lenis ? lenis.progress || 0 : nativeProgress());
+  };
+  const start = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  addEventListener('pagehide', (e) => { if (e.persisted) return; stop(); if (lenis) { lenis.destroy(); lenis = null; window.jhLenis = null; } });
+  start();
+}
+</script>
+
+
+</div>

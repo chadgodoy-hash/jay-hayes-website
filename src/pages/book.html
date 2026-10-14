@@ -1,0 +1,97 @@
+<style>
+.jh .bk-hero { padding: clamp(56px, 6vw, 100px) 0 48px; }
+.jh .bk-hero h1 { margin-top: 24px; font-size: clamp(2.6rem, 1.5rem + 4vw, 5rem); max-width: 16ch; }
+.jh .bk-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: start; padding-bottom: clamp(88px, 8vw, 140px); }
+.jh .bk-expect h2 { font-family: var(--font-body); font-weight: 600; font-size: 1.15rem; }
+.jh .bk-expect ul { margin-top: 18px; display: grid; gap: 14px; }
+.jh .bk-expect li { padding-left: 26px; position: relative; color: var(--dusk-soft); }
+.jh .bk-expect li::before { content: ""; position: absolute; left: 0; top: .6em; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--eucalypt); }
+.jh .bk-note { margin-top: 32px; padding: 20px 22px; border-radius: 18px; background: var(--haze); font-size: var(--t-small); }
+.jh .bk-cal { background: var(--white); border-radius: var(--radius); padding: 12px; min-height: 640px; box-shadow: 0 1px 0 rgba(30, 42, 74, .06), 0 24px 48px -24px rgba(30, 42, 74, .18); }
+.jh .bk-cal iframe { width: 100%; min-height: 700px; border: 0; border-radius: calc(var(--radius) - 8px); }
+.jh .bk-cal__empty { min-height: 616px; display: grid; place-items: center; text-align: center; padding: 32px; border: 1.5px dashed rgba(30, 42, 74, .2); border-radius: calc(var(--radius) - 8px); }
+.jh .bk-cal__empty p { max-width: 24rem; color: var(--dusk-soft); margin-top: 10px; }
+
+.jh .msg__grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 56px; align-items: start; }
+.jh .msg .form { background: var(--white); padding: clamp(24px, 3vw, 40px); border-radius: var(--radius); }
+.jh .msg .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.jh .consent { display: flex; gap: 12px; align-items: flex-start; font-size: var(--t-small); color: var(--dusk-soft); }
+.jh .consent input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--eucalypt); flex: none; }
+.jh .msg .btn { justify-self: start; }
+@media (max-width: 991px) {
+  .jh .bk-grid, .jh .msg__grid { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 600px) { .jh .msg .form__row { grid-template-columns: 1fr; } }
+</style>
+
+<main>
+  <section class="bk-hero">
+    <div class="wrap">
+      <p class="label">Free 20&#8209;minute call</p>
+      <h1 class="display">Let’s talk about what your gut is doing.</h1>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap bk-grid">
+      <div class="bk-expect">
+        <h2>On the call, we’ll</h2>
+        <ul>
+          <li>talk through your symptoms and what you’ve already tried</li>
+          <li>look at whether gut-brain therapy suits what’s going on for you</li>
+          <li>answer your questions about sessions, timing and cost</li>
+          <li>agree on a next step, if it feels right</li>
+        </ul>
+        <p class="bk-note">The call is by video, free, and comes with no obligation to book further sessions.</p>
+      </div>
+      <div class="bk-cal" data-booking>
+        <div class="bk-cal__empty" data-booking-empty>
+          <div>
+            <p class="h3">Booking calendar</p>
+            <p>The online calendar isn’t connected yet. Please use the message form below and Jay will get back to you to find a time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--haze msg" id="message">
+    <div class="wrap msg__grid">
+      <div>
+        <p class="label">Prefer to write first?</p>
+        <h2 class="h2" style="margin-top:20px">Send Jay a message</h2>
+        <p class="muted" style="margin-top:20px;max-width:28rem">Ask a question or tell her a little about what’s going on. You’ll hear back within two business days.</p>
+      </div>
+      <form class="form" data-signup="contact" data-tags="website-enquiry" data-success="Thanks, your message is on its way. Jay will reply within two business days.">
+        <div class="form__row">
+          <div class="field"><label for="c-first">First name</label><input id="c-first" name="first_name" autocomplete="given-name" required></div>
+          <div class="field"><label for="c-last">Last name</label><input id="c-last" name="last_name" autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label for="c-email">Email</label><input id="c-email" type="email" name="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-msg">Your message</label><textarea id="c-msg" name="message" required></textarea></div>
+        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="consent"><input type="checkbox" name="consent" required> I agree to Jay storing my details to reply to this message.</label>
+        <button type="submit" class="btn">Send message</button>
+        <p class="form__msg" aria-live="polite"></p>
+        <p class="muted" style="font-size:.8125rem">This form isn’t monitored for emergencies. If you’re in crisis, call Lifeline on 13 11 14 or 000.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var url = (window.JH_CONFIG || {}).bookingCalendarUrl;
+  var box = document.querySelector('[data-booking]');
+  if (!url || !box) return;
+  box.querySelector('[data-booking-empty]').remove();
+  var f = document.createElement('iframe');
+  f.src = url; f.title = 'Book a free 20-minute call with Jay'; f.loading = 'lazy'; f.scrolling = 'no';
+  f.id = 'jh-booking-' + Math.random().toString(36).slice(2);
+  box.appendChild(f);
+  // HighLevel's embed script resizes the calendar to fit its content.
+  var s = document.createElement('script');
+  s.src = 'https://link.msgsndr.com/js/form_embed.js'; s.async = true;
+  document.body.appendChild(s);
+})();
+</script>

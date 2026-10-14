@@ -1,0 +1,9 @@
+{
+  "_help": "Fill these in, then run: node build.mjs. See README > HighLevel setup.",
+  "signupWebhook": "",
+  "_signupWebhook": "HighLevel > Automation > Workflow with an 'Inbound Webhook' trigger. The contact form posts here.",
+  "bookingCalendarUrl": "",
+  "_bookingCalendarUrl": "HighLevel > Calendars > your 'Free 20-minute call' calendar > Share > copy the booking link (looks like https://api.leadconnectorhq.com/widget/booking/XXXX).",
+  "contactEmail": "",
+  "instagramUrl": ""
+}

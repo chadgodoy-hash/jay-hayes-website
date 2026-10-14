@@ -1,0 +1,54 @@
+<style>
+.jh .footer { background: var(--mist); padding: 72px 0 40px; font-size: var(--t-small); position: relative; z-index: 1; }
+.jh .footer__top { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid rgba(30, 42, 74, .12); }
+.jh .footer__about p { margin-top: 18px; max-width: 26rem; color: var(--dusk-soft); }
+.jh .footer h2 { font-size: var(--t-label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--eucalypt-text); margin-bottom: 14px; }
+.jh .footer__links { display: flex; flex-direction: column; gap: 8px; }
+.jh .footer__links a { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .jh .footer__links a:hover { text-decoration: underline; text-underline-offset: 3px; } }
+.jh .footer__fine { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding-top: 32px; color: var(--dusk-soft); font-size: .8125rem; line-height: 1.6; }
+.jh .footer__copy { margin-top: 28px; color: var(--dusk-soft); font-size: .8125rem; }
+@media (max-width: 767px) {
+  .jh .footer__top, .jh .footer__fine { grid-template-columns: 1fr; gap: 32px; }
+}
+</style>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__about">
+        <a href="/" class="wordmark" aria-label="Jay Hayes home">
+          <span class="wordmark__name">Jay Hayes</span>
+          <span class="wordmark__role">Gut-brain therapy</span>
+        </a>
+        <p>Psychotherapy and gut-directed hypnotherapy for people living with IBS and other gut-brain conditions. Sessions online, from Brisbane.</p>
+      </div>
+      <div>
+        <h2>Explore</h2>
+        <nav class="footer__links" aria-label="Footer">
+          <a href="/#how-it-works">How it works</a>
+          <a href="/#approach">Approach</a>
+          <a href="/about">About Jay</a>
+          <a href="/resources">Free resources</a>
+          <a href="/#faq">FAQ</a>
+          <a href="/book">Book a free call</a>
+        </nav>
+      </div>
+      <div>
+        <h2>Get in touch</h2>
+        <div class="footer__links">
+          <a href="/book#message">Send a message</a>
+          <a href="mailto:{{config:contactEmail}}" data-if-config="contactEmail">{{config:contactEmail}}</a>
+          <a href="{{config:instagramUrl}}" target="_blank" rel="noopener" data-if-config="instagramUrl">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__fine">
+      <p><strong>A note on medical care.</strong> Gut-brain therapy works alongside medical care, not instead of it. If you haven’t already, please see your GP or gastroenterologist to rule out other causes of your symptoms. If you’re in crisis, call Lifeline on 13 11 14 or emergency services on 000.</p>
+      <p>Jay lives and works on the lands of the Turrbal and Yuggera peoples. She pays her respects to Elders past and present, and acknowledges Aboriginal and Torres Strait Islander peoples as the Traditional Custodians of this land.</p>
+    </div>
+    <p class="footer__copy">© <span data-year>2026</span> Jay Hayes. All rights reserved.</p>
+  </div>
+</footer>
+
+{{include:smooth-scroll}}

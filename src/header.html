@@ -1,0 +1,62 @@
+<style>
+.jh .nav { position: sticky; top: 0; z-index: 100; transition: background-color .4s var(--ease), box-shadow .4s var(--ease); }
+.jh .nav.is-scrolled { background: rgba(243, 241, 248, .92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(30, 42, 74, .08); }
+.jh .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 18px; padding-bottom: 18px; }
+.jh .wordmark { display: flex; flex-direction: column; text-decoration: none; line-height: 1; }
+.jh .wordmark__name { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: -.02em; }
+.jh .wordmark__role { font-size: .72rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--eucalypt-text); margin-top: 6px; }
+.jh .nav__links { display: flex; gap: 30px; }
+.jh .nav__links a { text-decoration: none; font-weight: 500; font-size: .95rem; padding: 6px 0; border-bottom: 1.5px solid transparent; transition: border-color 200ms ease; }
+.jh .nav__links a[aria-current="page"] { border-bottom-color: var(--apricot); }
+@media (hover: hover) and (pointer: fine) { .jh .nav__links a:hover { border-bottom-color: var(--apricot); } }
+.jh .nav .btn { padding: 14px 22px; font-size: .95rem; }
+.jh .nav__toggle { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; }
+.jh .nav__toggle span, .jh .nav__toggle span::before, .jh .nav__toggle span::after { content: ""; display: block; width: 22px; height: 1.75px; background: var(--dusk); position: relative; transition: transform .3s var(--ease), background-color .3s; }
+.jh .nav__toggle span::before { position: absolute; top: -7px; }
+.jh .nav__toggle span::after { position: absolute; top: 7px; }
+.jh .nav.is-open .nav__toggle span { background: transparent; }
+.jh .nav.is-open .nav__toggle span::before { transform: translateY(7px) rotate(45deg); }
+.jh .nav.is-open .nav__toggle span::after { transform: translateY(-7px) rotate(-45deg); }
+.jh .nav__panel { display: none; }
+@media (max-width: 900px) {
+  .jh .nav__links, .jh .nav__inner > .btn { display: none; }
+  .jh .nav__toggle { display: flex; }
+  .jh .nav__panel { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--mist); box-shadow: 0 12px 24px rgba(30, 42, 74, .08);
+    opacity: 0; transform: translateY(-8px); visibility: hidden; pointer-events: none;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s linear 240ms; }
+  .jh .nav.is-open .nav__panel { opacity: 1; transform: none; visibility: visible; pointer-events: auto;
+    transition: opacity 200ms ease, transform 240ms var(--ease), visibility 0s; }
+  .jh .nav__panel-inner { display: flex; flex-direction: column; padding: 8px 20px 28px; }
+  .jh .nav__panel a:not(.btn) { font-family: var(--font-display); font-size: 1.75rem; text-decoration: none; padding: 12px 0; border-bottom: 1px solid rgba(30, 42, 74, .1); }
+  .jh .nav__panel .btn { margin-top: 20px; align-self: flex-start; }
+}
+</style>
+
+<div class="scroll-progress" data-scroll-progress aria-hidden="true"></div>
+<header class="nav" data-nav>
+  <div class="wrap nav__inner">
+    <a href="/" class="wordmark" aria-label="Jay Hayes, gut-brain therapy, home">
+      <span class="wordmark__name">Jay Hayes</span>
+      <span class="wordmark__role">Gut-brain therapy</span>
+    </a>
+    <nav class="nav__links" aria-label="Main">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+    </nav>
+    <a href="/book" class="btn">Book a free call</a>
+    <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" data-nav-toggle><span></span></button>
+  </div>
+  <div class="nav__panel" data-nav-panel>
+    <div class="nav__panel-inner">
+      <a href="/#how-it-works">How it works</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about">About Jay</a>
+      <a href="/resources">Resources</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/book" class="btn">Book a free call</a>
+    </div>
+  </div>
+</header>

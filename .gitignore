@@ -1,0 +1,4 @@
+.DS_Store
+node_modules/
+# saved copy of a third-party page, kept local only
+research/

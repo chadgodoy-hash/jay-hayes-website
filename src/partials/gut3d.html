@@ -1,0 +1,163 @@
+<!-- 3D gut: oesophagus, stomach, small intestine and colon. The vagus-nerve line arrives at the top of the oesophagus.
+     Peristalsis waves run along the tubes; when the line connects (you reach the end of the page) they slow into the
+     same breathing rhythm as the brain. Falls back to the plain line + coil if WebGL or three.js is unavailable. -->
+<canvas class="gut3d" data-gut aria-hidden="true"></canvas>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const canvas = document.querySelector('[data-gut]');
+const host = canvas && canvas.closest('.closing__gut');
+const endMark = host && host.querySelector('[data-gb-end]');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' }); }
+catch (e) { renderer = null; }
+
+if (renderer && host) {
+  const small = innerWidth < 768;
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+
+  const vert = /* glsl */`
+    uniform float uR; uniform float uTaper; uniform float uHaustra; uniform float uWaveK; uniform float uWaveAmp; uniform float uPhase;
+    varying vec3 vPosW; varying float vCrease;
+    void main(){
+      float u = uv.x;
+      // gentle taper at both ends (stomach), so tubes blend into each other
+      float scale = uTaper > 0.5 ? mix(0.38, 1.0, smoothstep(0.0, 0.3, u)) * mix(1.0, 0.42, smoothstep(0.7, 1.0, u)) : 1.0;
+      // colon pouches (haustra): soft rings along the tube
+      float ring = uHaustra > 0.5 ? pow(abs(sin(u * 64.0)), 0.6) : 1.0;
+      vCrease = uHaustra > 0.5 ? 1.0 - ring : 0.0;
+      // peristalsis: soft bulges travelling along the length
+      float w = fract(u * uWaveK - uPhase) - 0.5;
+      float wave = exp(-w * w * 70.0);
+      float d = uR * (scale - 1.0) + uR * 0.14 * (ring - 1.0) + uWaveAmp * wave;
+      vec3 p = position + normal * d;
+      vec4 world = modelMatrix * vec4(p, 1.0);
+      vPosW = world.xyz;
+      gl_Position = projectionMatrix * viewMatrix * world;
+    }`;
+  const frag = /* glsl */`
+    uniform vec3 uBase; uniform vec3 uDeep; uniform vec3 uRim; uniform float uGlow;
+    varying vec3 vPosW; varying float vCrease;
+    void main(){
+      vec3 N = normalize(cross(dFdx(vPosW), dFdy(vPosW)));
+      vec3 V = normalize(cameraPosition - vPosW);
+      if (dot(N, V) < 0.0) N = -N;
+      vec3 L = normalize(vec3(-0.4, 0.9, 0.8));
+      float diff = clamp(dot(N, L), 0.0, 1.0) * 0.42 + 0.62;
+      float rim = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 2.2);
+      vec3 col = mix(uBase, uDeep, vCrease * 0.7) * diff;
+      col = mix(col, uRim, rim * (0.45 + 0.35 * uGlow));
+      col += pow(max(dot(N, normalize(L + V)), 0.0), 40.0) * 0.12;
+      col *= 0.82 + 0.18 * uGlow;                       // warms up as the gut calms
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+  const C = (hex) => new THREE.Color(hex);
+  const shared = { uBase: { value: C('#F5C6AB') }, uDeep: { value: C('#D8917F') }, uRim: { value: C('#E6DEFF') }, uGlow: { value: 0 }, uPhase: { value: 0 }, uWaveAmp: { value: 0.03 } };
+  const tube = (pts, r, o = {}) => {
+    const curve = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p)), false, 'centripetal');
+    const seg = Math.round((o.seg || 200) * (small ? 0.6 : 1));
+    const geo = new THREE.TubeGeometry(curve, seg, r, small ? 14 : 22, false);
+    const m = new THREE.ShaderMaterial({
+      vertexShader: vert, fragmentShader: frag,
+      uniforms: { ...shared, uR: { value: r }, uTaper: { value: o.taper ? 1 : 0 }, uHaustra: { value: o.haustra ? 1 : 0 }, uWaveK: { value: o.waveK || 3 } },
+    });
+    return new THREE.Mesh(geo, m);
+  };
+
+  // Paths in a roughly [-1, 1] box (front view). Small intestine is a serpentine coil with tiny loops and depth.
+  const smallInt = [];
+  for (let i = 0; i <= 220; i++) {
+    const t = i / 220;
+    smallInt.push([
+      0.34 * Math.sin(t * Math.PI * 6.5 + 0.4) + 0.05 * Math.sin(t * Math.PI * 31),
+      0.18 - 0.66 * t + 0.035 * Math.cos(t * Math.PI * 31),
+      0.16 + 0.1 * Math.sin(t * Math.PI * 9),
+    ]);
+  }
+  smallInt.unshift([0.24, 0.42, 0.14], [0.26, 0.3, 0.15]);           // duodenum, coming down from the stomach
+  smallInt.push([0.44, -0.52, 0.1]);                                 // into the colon's start (caecum)
+  const colon = [[0.5, -0.58, 0.05], [0.58, -0.2, 0.08], [0.6, 0.22, 0.08], [0.5, 0.46, 0.05], [0.25, 0.4, 0.1], [0, 0.34, 0.12],
+    [-0.27, 0.4, 0.1], [-0.55, 0.48, 0.05], [-0.62, 0.18, 0.06], [-0.6, -0.26, 0.06], [-0.48, -0.56, 0.08],
+    [-0.28, -0.64, 0.12], [-0.12, -0.56, 0.14], [-0.04, -0.74, 0.1], [0, -0.92, 0.04]];
+  const stomach = [[-0.17, 0.86, 0.08], [-0.3, 0.76, 0.12], [-0.32, 0.63, 0.14], [-0.17, 0.57, 0.16], [0.04, 0.62, 0.15], [0.2, 0.68, 0.13], [0.26, 0.56, 0.13]];
+  const TOP = [-0.15, 1.18, 0.04];                                   // top of the oesophagus: where the line arrives
+  const oesophagus = [TOP, [-0.15, 1.04, 0.05], [-0.16, 0.92, 0.07], [-0.18, 0.84, 0.08]];
+
+  const gut = new THREE.Group();
+  gut.add(
+    tube(colon, 0.088, { seg: 260, haustra: true, waveK: 2.2 }),
+    tube(smallInt, 0.05, { seg: 900, waveK: 7 }),
+    tube(stomach, 0.135, { seg: 120, taper: true, waveK: 1.4 }),
+    tube(oesophagus, 0.035, { seg: 40, waveK: 1 }),
+  );
+  // Pivot at the top of the oesophagus: sway and breathing happen around where the nerve line connects.
+  gut.position.set(-TOP[0], -TOP[1], -TOP[2]);
+  const pivot = new THREE.Group(); pivot.add(gut);
+  pivot.position.set(TOP[0], TOP[1], TOP[2]);
+  const scene = new THREE.Scene(); scene.add(pivot);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20);
+  camera.position.set(0, 0.12, 4.5); camera.lookAt(0, 0.12, 0);
+
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    const p = new THREE.Vector3(...TOP).project(camera);
+    if (endMark) {
+      const cr = canvas.getBoundingClientRect(), hr = host.getBoundingClientRect();
+      const left = Math.round(cr.left - hr.left + (p.x + 1) / 2 * w) + 'px';
+      const top = Math.round(cr.top - hr.top + (1 - p.y) / 2 * h) + 'px';
+      if (left !== endMark.style.left || top !== endMark.style.top) {
+        endMark.style.left = left; endMark.style.top = top;
+        dispatchEvent(new CustomEvent('jh:relayout'));
+      }
+    }
+  };
+
+  // Breathing: share the brain's 11s cycle (read from the hero's CSS animation) so both organs breathe together.
+  const CYCLE = 11000;
+  const glow = document.querySelector('.breath__glow');
+  const phaseNow = (now) => {
+    const a = glow && glow.getAnimations && glow.getAnimations()[0];
+    const t = a && typeof a.currentTime === 'number' ? a.currentTime : now;
+    return (t % CYCLE) / CYCLE;
+  };
+  const gutTag = () => document.querySelector('.gbline__tag:not(.gbline__tag--brain)');
+
+  let calm = reduce ? 1 : 0, visible = false, raf = 0, last = performance.now();
+  const frame = (now) => {
+    raf = 0;
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const tag = gutTag();
+    const target = reduce || (tag && tag.classList.contains('is-on')) ? 1 : 0;
+    calm += (target - calm) * (1 - Math.exp(-dt / 1.6));              // eases over ~3s
+    host.classList.toggle('is-calm', calm > 0.5);
+    // restless before the nerve connects, slow and even after
+    shared.uPhase.value += dt * (0.32 - 0.24 * calm);
+    shared.uWaveAmp.value = 0.032 - 0.012 * calm;
+    const breath = 0.5 - 0.5 * Math.cos(phaseNow(now) * Math.PI * 2);
+    shared.uGlow.value = calm * (0.55 + 0.45 * breath);
+    pivot.scale.setScalar(reduce ? 1 : 0.975 + 0.035 * breath * (0.4 + 0.6 * calm));
+    const t = now / 1000;
+    pivot.rotation.y = reduce ? 0.2 : Math.sin(t * 0.16) * 0.32;
+    pivot.rotation.x = reduce ? 0 : Math.sin(t * 0.11) * 0.04;
+    renderer.render(scene, camera);
+    if (!reduce && visible && !document.hidden) raf = requestAnimationFrame(frame);
+  };
+  const play = () => { if (!raf && !reduce && visible && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+
+  new IntersectionObserver((es) => { visible = es[0].isIntersecting; play(); }).observe(canvas);
+  document.addEventListener('visibilitychange', play);
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { resize(); if (!raf) frame(performance.now()); }, 120); });
+
+  host.classList.add('has-gut');
+  resize();
+  dispatchEvent(new CustomEvent('jh:relayout'));                     // re-route the line now that the gut is here
+  frame(performance.now());
+  canvas.classList.add('is-ready');
+}
+</script>

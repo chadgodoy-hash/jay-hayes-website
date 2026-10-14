@@ -1,0 +1,22 @@
+{
+  "home": {
+    "path": "/",
+    "title": "Jay Hayes | Gut-Brain Therapist for IBS (Online, Brisbane)",
+    "description": "Psychotherapy and gut-directed hypnotherapy for IBS and other gut-brain conditions. Book a free 20-minute call with Jay Hayes."
+  },
+  "about": {
+    "path": "/about",
+    "title": "About Jay Hayes | Psychotherapist & Clinical Hypnotherapist",
+    "description": "From social work to gut-brain therapy: Jay Hayes helps people with IBS calm their symptoms through talk therapy, gut-directed hypnotherapy, nervous system work and EMDR."
+  },
+  "book": {
+    "path": "/book",
+    "title": "Book a Free Call | Jay Hayes Gut-Brain Therapy",
+    "description": "Book a free 20-minute call with Jay Hayes to talk about your gut symptoms and whether gut-brain therapy is right for you."
+  },
+  "resources": {
+    "path": "/resources",
+    "title": "Free Resources | Jay Hayes Gut-Brain Therapy",
+    "description": "Free gut-brain resources from Jay Hayes: a gut-calming relaxation, a symptom diary, a plain-English guide and more. Sign up to get each one when it's ready."
+  }
+}

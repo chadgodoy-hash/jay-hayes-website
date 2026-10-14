@@ -1,0 +1,208 @@
+<!-- 3D breathing brain, sculpted in code: lobes, Sylvian + central sulci, a flat medial face, dense maze-like gyri,
+     darker sulci and soft tissue lighting. The apricot gut-brain line starts at the brainstem, where the vagus nerve leaves
+     the brain. If WebGL or the three.js download fails, nothing breaks: the glowing orb behind it stays as the fallback. -->
+<canvas class="brain3d" data-brain aria-hidden="true"></canvas>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const canvas = document.querySelector('[data-brain]');
+const host = canvas && canvas.closest('.hero__start');
+const startMark = host && host.querySelector('[data-gb-start]');
+const glow = host && host.querySelector('.breath__glow');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' }); }
+catch (e) { renderer = null; }
+
+if (renderer && host) {
+  const small = innerWidth < 768;
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+
+  // ---------- 3D simplex noise (Stefan Gustavson, public domain) ----------
+  const grad = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]];
+  const perm = new Uint8Array(512);
+  { const p = new Uint8Array(256); for (let i = 0; i < 256; i++) p[i] = i;
+    let s = 1337; for (let i = 255; i > 0; i--) { s = (s * 16807) % 2147483647; const j = s % (i + 1); [p[i], p[j]] = [p[j], p[i]]; }
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255]; }
+  const F3 = 1 / 3, G3 = 1 / 6;
+  const noise = (x, y, z) => {
+    const s = (x + y + z) * F3, i = Math.floor(x + s), j = Math.floor(y + s), k = Math.floor(z + s);
+    const t = (i + j + k) * G3, x0 = x - i + t, y0 = y - j + t, z0 = z - k + t;
+    let i1, j1, k1, i2, j2, k2;
+    if (x0 >= y0) { if (y0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=1;k2=0; } else if (x0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=0;k2=1; } else { i1=0;j1=0;k1=1;i2=1;j2=0;k2=1; } }
+    else { if (y0 < z0) { i1=0;j1=0;k1=1;i2=0;j2=1;k2=1; } else if (x0 < z0) { i1=0;j1=1;k1=0;i2=0;j2=1;k2=1; } else { i1=0;j1=1;k1=0;i2=1;j2=1;k2=0; } }
+    const c = [[x0, y0, z0, 0, 0, 0], [x0 - i1 + G3, y0 - j1 + G3, z0 - k1 + G3, i1, j1, k1],
+      [x0 - i2 + 2 * G3, y0 - j2 + 2 * G3, z0 - k2 + 2 * G3, i2, j2, k2], [x0 - 1 + 3 * G3, y0 - 1 + 3 * G3, z0 - 1 + 3 * G3, 1, 1, 1]];
+    const ii = i & 255, jj = j & 255, kk = k & 255; let n = 0;
+    for (const [a, b, d, oi, oj, ok] of c) {
+      let tt = 0.6 - a * a - b * b - d * d; if (tt < 0) continue;
+      const g = grad[perm[ii + oi + perm[jj + oj + perm[kk + ok]]] % 12];
+      tt *= tt; n += tt * tt * (g[0] * a + g[1] * b + g[2] * d);
+    }
+    return 32 * n;
+  };
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+  // Indexed, evenly tessellated sphere (so normals are smooth and every vertex is displaced once).
+  const sphere = (detail) => {
+    const pos = new THREE.IcosahedronGeometry(1, detail).attributes.position.array;
+    const map = new Map(), verts = [], idx = [];
+    for (let i = 0; i < pos.length; i += 3) {
+      const key = Math.round(pos[i] * 1e5) + ',' + Math.round(pos[i + 1] * 1e5) + ',' + Math.round(pos[i + 2] * 1e5);
+      let k = map.get(key);
+      if (k === undefined) { k = verts.length / 3; map.set(key, k); verts.push(pos[i], pos[i + 1], pos[i + 2]); }
+      idx.push(k);
+    }
+    return { verts: new Float32Array(verts), idx };
+  };
+
+  // ---------- one hemisphere, local axes: +x lateral, y up, +z front ----------
+  const hemisphere = (side, seed, detail) => {
+    const { verts, idx } = sphere(detail);
+    const n = verts.length / 3, colors = new Float32Array(n * 3);
+    for (let v = 0; v < n; v++) {
+      const dx = verts[v * 3], dy = verts[v * 3 + 1], dz = verts[v * 3 + 2];
+      // silhouette: long front-to-back, flat medial face, flatter base, tapering occipital pole
+      let x = dx < 0 ? dx * 0.12 : dx, y = dy < 0 ? dy * 0.7 : dy, z = dz;
+      const back = Math.max(0, -dz);
+      x *= 1 - 0.14 * back; y *= 1 - 0.1 * back;
+      let px = x * 0.6, py = y * 0.66, pz = z * 0.9;
+      // temporal lobe: rounded bulge low on the side, toward the front
+      const tl = Math.exp(-((dx - 0.75) ** 2 + (dy + 0.5) ** 2 + (dz - 0.05) ** 2) / 0.18);
+      px += 0.06 * tl; py -= 0.08 * tl;
+      const lateral = smooth(0.05, 0.4, dx);
+      // Sylvian (lateral) sulcus: rises from the front-bottom toward the back, separating the temporal lobe
+      const sylvian = Math.exp(-(((dy - (-0.16 + 0.42 * Math.max(0, 0.35 - dz))) / 0.09) ** 2)) * lateral * smooth(-0.5, 0.2, dz) * smooth(0.75, 0.3, dz);
+      // central sulcus: runs from the top down toward the Sylvian fissure
+      const central = Math.exp(-(((dz - (0.02 + 0.18 * dy)) / 0.045) ** 2)) * smooth(-0.05, 0.25, dy) * smooth(-0.2, 0.3, dx + 0.3);
+      // gyri: dense, winding, even-width folds (domain-warped noise bands); fewer on the hidden medial face
+      const q = 2.3, wq = 0.45;
+      const wx = dx * q + wq * noise(dx * 1.1 + seed, dy * 1.1, dz * 1.1);
+      const wy = dy * q + wq * noise(dx * 1.1, dy * 1.1 + seed, dz * 1.1);
+      const wz = dz * q * 0.85 + wq * noise(dx * 1.1, dy * 1.1, dz * 1.1 + seed);
+      const band = Math.sin(noise(wx, wy, wz) * 10.5 + noise(wx * 2, wy * 2, wz * 2) * 1.2);
+      const ridge = Math.pow(0.5 + 0.5 * band, 0.45);                  // broad rounded gyri, narrow sulci
+      const folds = (dx < 0 ? 0.35 : 1) * (1 - ridge);
+      const depth = 0.034 * folds + 0.085 * sylvian + 0.04 * central;
+      const len = Math.hypot(px, py, pz) || 1;
+      const k = 1 - depth / len;
+      verts[v * 3] = side * px * k; verts[v * 3 + 1] = py * k; verts[v * 3 + 2] = pz * k;
+      // shading: darken the sulci (cheap ambient occlusion), keep the tops of the folds light
+      const ao = 1 - Math.min(0.55, folds * 0.42 + sylvian * 0.5 + central * 0.35);
+      colors[v * 3] = ao; colors[v * 3 + 1] = ao * 0.97; colors[v * 3 + 2] = ao * 0.98;
+    }
+    if (side < 0) for (let i = 0; i < idx.length; i += 3) { const t = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = t; }  // mirrored: keep faces outward
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    g.setIndex(idx); g.computeVertexNormals();
+    return g;
+  };
+
+  // cerebellum: finely layered folds running side to side
+  const cerebellum = (detail) => {
+    const { verts, idx } = sphere(detail);
+    const n = verts.length / 3, colors = new Float32Array(n * 3);
+    for (let v = 0; v < n; v++) {
+      const dx = verts[v * 3], dy = verts[v * 3 + 1], dz = verts[v * 3 + 2];
+      const band = Math.sin(dy * 30 + noise(dx * 2, dy * 2, dz * 2) * 1.6);
+      const fold = 1 - Math.pow(0.5 + 0.5 * band, 0.5);
+      const r = 1 - 0.07 * fold;
+      verts[v * 3] = dx * 0.5 * r; verts[v * 3 + 1] = dy * 0.23 * r; verts[v * 3 + 2] = dz * 0.29 * r;
+      const ao = 1 - fold * 0.4; colors[v * 3] = ao; colors[v * 3 + 1] = ao * 0.97; colors[v * 3 + 2] = ao * 0.98;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    g.setIndex(idx); g.computeVertexNormals();
+    return g;
+  };
+
+  // ---------- material + light: soft tissue in the site's apricot, lilac fill and rim ----------
+  const tissue = new (small ? THREE.MeshStandardMaterial : THREE.MeshPhysicalMaterial)({
+    color: '#F3B9A1', roughness: 0.6, metalness: 0, vertexColors: true,
+    emissive: '#F2A779', emissiveIntensity: 0.05,
+    ...(small ? {} : { sheen: 0.7, sheenColor: new THREE.Color('#E9DEFF'), sheenRoughness: 0.45, clearcoat: 0.12, clearcoatRoughness: 0.55 }),
+  });
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight('#FFF4EE', '#B8A9DA', 1.5));
+  const key = new THREE.DirectionalLight('#FFE6D6', 2.1); key.position.set(-2.5, 3.2, 3); scene.add(key);
+  const rim = new THREE.DirectionalLight('#D9CCFF', 1.6); rim.position.set(2.5, 1.2, -3); scene.add(rim);
+
+  // ---------- assemble (pivot at the bottom of the brainstem, where the line begins) ----------
+  const detail = small ? 44 : 72;
+  const brain = new THREE.Group();
+  const right = new THREE.Mesh(hemisphere(1, 3.7, detail), tissue); right.position.set(0.075, 0.2, 0);
+  const left = new THREE.Mesh(hemisphere(-1, 11.3, detail), tissue); left.position.set(-0.075, 0.2, 0);
+  const cereb = new THREE.Mesh(cerebellum(small ? 28 : 40), tissue); cereb.position.set(0, -0.2, -0.5);
+  const stemMat = tissue.clone(); stemMat.vertexColors = false; stemMat.color = new THREE.Color('#E8AA93');
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.095, 0.06, 0.82, 32, 8), stemMat);
+  stem.position.set(0, -0.6, -0.22); stem.rotation.x = -0.25;
+  brain.add(right, left, cereb, stem);
+  const STEM_BOTTOM = new THREE.Vector3(0, -0.997, -0.12);
+  brain.position.copy(STEM_BOTTOM).multiplyScalar(-1);
+  const pivot = new THREE.Group(); pivot.add(brain); scene.add(pivot);
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 20);
+  camera.position.set(0, 1.04, 5.5); camera.lookAt(0, 1.04, 0);
+
+  // ---------- sizing + placing the line's start on the brainstem ----------
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    const p = new THREE.Vector3(0, 0, 0).project(camera);
+    if (startMark) {
+      const cr = canvas.getBoundingClientRect(), hr = host.getBoundingClientRect();
+      const left = Math.round(cr.left - hr.left + (p.x + 1) / 2 * w) + 'px';
+      const top = Math.round(cr.top - hr.top + (1 - p.y) / 2 * h) + 'px';
+      if (left !== startMark.style.left || top !== startMark.style.top) {
+        startMark.style.left = left; startMark.style.top = top;
+        dispatchEvent(new CustomEvent('jh:relayout'));
+      }
+    }
+  };
+
+  // ---------- breathing: locked to the CSS "breathe in / out" cycle (11s) ----------
+  const CYCLE = 11000;
+  const phaseNow = (now) => {
+    const a = glow && glow.getAnimations && glow.getAnimations()[0];
+    const t = a && typeof a.currentTime === 'number' ? a.currentTime : now;
+    return (t % CYCLE) / CYCLE;
+  };
+  let mx = 0, my = 0, sx = 0, sy = 0;
+  if (finePointer && !reduce) addEventListener('pointermove', (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+  let visible = true, raf = 0, last = performance.now();
+  const frame = (now) => {
+    raf = 0;
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const breath = 0.5 - 0.5 * Math.cos(phaseNow(now) * Math.PI * 2);
+    pivot.scale.setScalar(reduce ? 0.97 : 0.93 + 0.08 * breath);
+    tissue.emissiveIntensity = stemMat.emissiveIntensity = reduce ? 0.06 : 0.03 + 0.07 * breath;   // faint warm glow on the in-breath
+    sx += (mx - sx) * (1 - Math.exp(-dt * 3)); sy += (my - sy) * (1 - Math.exp(-dt * 3));
+    const t = now / 1000;
+    pivot.rotation.y = -1.38 + (reduce ? 0 : Math.sin(t * 0.18) * 0.28 + sx * 0.45);
+    pivot.rotation.x = reduce ? 0.04 : 0.04 + Math.sin(t * 0.13) * 0.05 + sy * 0.18;
+    renderer.render(scene, camera);
+    if (!reduce && visible && !document.hidden) raf = requestAnimationFrame(frame);
+  };
+  const play = () => { if (!raf && !reduce && visible && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+
+  new IntersectionObserver((es) => { visible = es[0].isIntersecting; play(); }).observe(canvas);
+  document.addEventListener('visibilitychange', play);
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { resize(); if (!raf) frame(performance.now()); }, 120); });
+
+  resize();
+  frame(performance.now());
+  canvas.classList.add('is-ready');
+  host.classList.add('has-brain');
+  const tag = document.querySelector('.gbline__tag--brain');
+  if (tag) tag.textContent = 'the vagus nerve';
+}
+</script>

@@ -1,0 +1,42 @@
+{
+  "_help": [
+    "Draft list for Jay to confirm. Each item renders as a row on /resources.",
+    "status: 'coming-soon' shows a 'Notify me' signup; 'available' shows 'Send me the download'.",
+    "Both post to the HighLevel signup webhook with source 'resource-waitlist' or 'resource-download' and the tag 'resource-<slug>'.",
+    "For 'available' items, the HighLevel workflow emails the file (upload it to HighLevel Media first)."
+  ],
+  "items": [
+    {
+      "slug": "gut-calming-audio",
+      "type": "Audio",
+      "title": "A 10-minute gut-calming relaxation",
+      "description": "A short guided relaxation to help settle your nervous system when your gut flares. Listen with headphones, somewhere you can sit or lie down.",
+      "format": "MP3 · about 10 minutes",
+      "status": "coming-soon"
+    },
+    {
+      "slug": "symptom-diary",
+      "type": "Printable",
+      "title": "Gut-brain symptom diary",
+      "description": "A simple daily page for noticing patterns between your symptoms, stress, sleep and meals, so you have something concrete to bring to your GP or to our sessions.",
+      "format": "PDF · printable",
+      "status": "coming-soon"
+    },
+    {
+      "slug": "gut-brain-guide",
+      "type": "Guide",
+      "title": "The gut-brain connection, in plain English",
+      "description": "How your gut and brain talk to each other, why stress and symptoms feed each other, and what gut-directed therapy actually involves.",
+      "format": "PDF guide",
+      "status": "coming-soon"
+    },
+    {
+      "slug": "gp-questions",
+      "type": "Checklist",
+      "title": "Questions to ask your GP about IBS",
+      "description": "A one-page checklist to help you get the most from your next appointment, including the questions people often wish they’d asked.",
+      "format": "PDF · one page",
+      "status": "coming-soon"
+    }
+  ]
+}
