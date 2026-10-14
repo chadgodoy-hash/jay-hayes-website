@@ -11,6 +11,12 @@ A three-page site for Jay Hayes, psychotherapist and clinical hypnotherapist. It
 
 SEO titles and descriptions for each page are in `dist/_pages.csv`. To check a page locally, open it in `dist/preview/`. Edit `src/`, then run `node build.mjs`.
 
+## Hosting (Hostinger)
+`node build.mjs` also writes a standalone static copy to `dist/site/`: one folder per page path, with photos in `img/`. It's live for review at https://mediumturquoise-stingray-818727.hostingersite.com (a temporary Hostinger address).
+- **Redeploy:** run `node build.mjs`, zip the *contents* of `dist/site/`, then use hPanel → Websites → this site → File manager (or the Hostinger static-site deploy) to upload and extract it into `public_html`.
+- **Forms and booking** use the same HighLevel webhook and calendar settings in `src/config.json`. Until those are set, they show the "not connected" state on Hostinger too.
+- **Custom domain:** once Jay has one, connect it to this website in hPanel.
+
 ## Design
 - **Signature: the gut-brain line.** One thin apricot line starts in the hero at *the brain*, threads down the side of the homepage (never over text), and coils into *the gut* beside the final "Book your free call" button. It draws itself as you scroll, and is shown fully drawn for visitors who prefer reduced motion. It appears on the homepage only.
 - **Palette ("dusk"):**
